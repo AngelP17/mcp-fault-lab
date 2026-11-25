@@ -53,3 +53,8 @@ Handled well: truncated SSE, HTML or empty JSON bodies, JSON-RPC error bodies on
 ## Regression CI
 
 The baseline profile pins MCP 2.3.0; the latest profile installs the current compatible SDK. Transitive dependencies are recorded with `pip freeze` in each CI artifact, not claimed to be fully locked. Each run publishes raw reports and a generated `matrix.md`. Known session-killing transport failures in `truncate_json` are classified XFAIL; new failures fail CI, missing fault application is ERROR, and fixed known failures are XPASS. Historical October findings are not statements about current SDK behavior. See [claim-to-proof matrix](docs/CLAIMS.md).
+
+## Upstream research
+
+- [SDK issue #3522: original contributed variants and standalone repro](https://github.com/modelcontextprotocol/python-sdk/issues/3522#issuecomment-6307312577).
+- [Related reliability investigation: Langfuse S3 idle sockets](docs/related-research/langfuse-s3.md). Separate experiment, not an MCP SDK finding.
