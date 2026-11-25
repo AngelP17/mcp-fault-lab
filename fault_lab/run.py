@@ -364,6 +364,7 @@ async def amain(args: argparse.Namespace) -> int:
     cross = cross_checks(runs)
     meta = {"mcp": version("mcp"), "otel": version("opentelemetry-sdk"),
             "python": sys.version.split()[0], "ran_at": time.strftime("%Y-%m-%d %H:%M:%S %Z"),
+            "commit": __import__("os").environ.get("GITHUB_SHA", "local-unrecorded"),
             "modes": args.modes, "hang_budget_s": args.hang_budget,
             "scenarios": [asdict(s) for s in chosen]}
     write_report(out_dir, runs, cross, meta)

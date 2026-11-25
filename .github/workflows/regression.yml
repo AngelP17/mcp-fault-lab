@@ -1,0 +1,48 @@
+name: MCP regression evidence
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * 1'
+permissions:
+  contents: read
+jobs:
+  fault-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [baseline, latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.profile }}" = baseline ]; then
+            pip install -r requirements-baseline.txt
+          else
+            pip install -r requirements.txt
+          fi
+          mkdir -p out
+          pip freeze > out/dependencies.txt
+      - name: Classifier tests
+        run: python -m unittest discover -s tests
+      - name: Run and classify complete fault suite
+        shell: bash
+        run: |
+          set +e
+          python -m fault_lab.run --out out
+          status=$?
+          set -e
+          python scripts/classify_report.py out/report.json --runner-exit "$status"
+      - name: Publish evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-${{ matrix.profile }}-${{ github.sha }}
+          path: out/
+          retention-days: 30
